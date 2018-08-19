@@ -20,11 +20,25 @@ app.get("/", function (req, res) {
 
 
 // your first API endpoint... 
-app.get("/api/hello", function (req, res) {
-  res.json({greeting: 'hello API'});
+app.get("/api/timestamp" , function(req, res) {
+  const date = new Date()
+  return res.json({"unix": date.getTime(), "utc" : date.toUTCString() })
+})
+app.get("/api/timestamp/:dateString", function (req, res) {
+  let date = req.params.dateString
+  if (/^\d+$/.test(date)) {
+    date = parseInt(date)
+  }
+  date = new Date(date)
+  if (isNaN(date.getTime())) {
+    return res.json({"error" : "Invalid Date" })
+  }
+  return res.json({"unix": date.getTime(), "utc" : date.toUTCString() })
 });
 
-
+app.use(function (req, res, next) {
+  res.status(404).send("not found")
+})
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
